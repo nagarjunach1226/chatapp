@@ -26,39 +26,39 @@ def main():
         for page in pdf_reader.pages:
             text += page.extract_text()
         
-    text_splitter = RecursiveCharacterTextSplitter(
-    # Set a really small chunk size, just to show.
-    chunk_size = 100,
-    chunk_overlap  = 20,
-    length_function = len,
+        text_splitter = RecursiveCharacterTextSplitter(
     
-    )
+        chunk_size = 100,
+        chunk_overlap  = 20,
+        length_function = len,
+    
+        )
         
-    chunks=text_splitter.split_text(text)
+        chunks=text_splitter.split_text(text)
     #st.write(chunks)
         
     #Embeddings
     
-    embeddings=OpenAIEmbeddings()
-    Vectorstore = FAISS.from_texts(chunks,embedding=embeddings)
-    store_name = pdf.name[:4]
-    if os.path.exists(f"{store_name}.pkl"):
+        embeddings=OpenAIEmbeddings()
+        Vectorstore = FAISS.from_texts(chunks,embedding=embeddings)
+        store_name = pdf.name[:4]
+        if os.path.exists(f"{store_name}.pkl"):
         
-        with open(f"{store_name}.pkl", "rb") as f:
-            pickle.load(f)
+            with open(f"{store_name}.pkl", "rb") as f:
+                pickle.load(f)
         
-    else:
+        else:
         
-        with open(f"{store_name}.pkl", "wb") as f:
-            pickle.dump(Vectorstore,f)
-    query=st.text_input("Enter the query")
+            with open(f"{store_name}.pkl", "wb") as f:
+                pickle.dump(Vectorstore,f)
+        query=st.text_input("Enter the query")
     
-    if query:
-        docs= Vectorstore.similarity_search(query=query,k=3)
-        llm=OpenAI()
-        chain=load_qa_chain(llm,chain_type="stuff")
-        response=chain.run(input_documents=docs,question=query)
-        st.write(response)        
+        if query:
+            docs= Vectorstore.similarity_search(query=query,k=3)
+            llm=OpenAI()
+            chain=load_qa_chain(llm,chain_type="stuff")
+            response=chain.run(input_documents=docs,question=query)
+            st.write(response)        
     
   
 if __name__ == "__main__":
